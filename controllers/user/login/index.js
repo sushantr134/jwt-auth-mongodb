@@ -1,6 +1,7 @@
 const User = require("../../../models/user/index");
 const joi = require("joi");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 //validation
 const loggedInUserSchema = {
@@ -21,9 +22,17 @@ module.exports = async (req, res) => {
   } else {
     const userExists = await User.findOne({ email: value.email });
     if (userExists) {
+      const token = jwt.sign({ id: userExists._id }, process.env.JWT_SECRET_KEY);
       bcrypt
         .compare(value.password, userExists.password)
-        .then(loginStatus => (loginStatus ? res.status(200).json(userExists) : res.status(401).json({ msg: "Login Failed" })))
+        .then(loginStatus => {
+          if (loginStatus) {
+            res.header("auth-token", token);
+            res.status(200).json({ ...userExists._doc, authToken: token });
+          } else {
+            res.status(401).json({ msg: "Login Failed" });
+          }
+        })
         .catch(err => {
           if (err) {
             console.log(err.message);
