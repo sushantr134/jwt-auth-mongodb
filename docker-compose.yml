@@ -1,0 +1,12 @@
+version: "2.1"
+
+services:
+  jwt-auth:
+    image: jwt-auth
+    build: .
+    environment:
+      NODE_ENV: production
+      MONGO_CONNECTION_URI: ${MONGO_CONNECTION_URI}
+    command: npm start
+    ports:
+      - 5555:5555

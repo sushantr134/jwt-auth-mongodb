@@ -1,0 +1,12 @@
+version: "2.1"
+
+services:
+  jwt-auth:
+    image: jwt-auth
+    build: .
+    environment:
+      NODE_ENV: development
+    ports:
+      - 5555:5555
+      - 9229:9229
+    command: node --inspect=0.0.0.0:9229 app.js
